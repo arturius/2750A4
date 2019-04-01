@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Assignmet Three</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="The html for 2750A3">
+    <meta name="keywords" content="2750A3">
+    <meta name="author" content="James Arthur Anderson">
+    <!-- Load jquery, bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <!-- Custom CSS End -->
+</head>
+<body>
+	<div id="loginModal" ref='loginModal' class="modal">
+	<!-- Modal content Based on code from https://www.w3schools.com/howto/howto_css_modals.asp -->
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>DataBase Login</h2>
+			</div>
+			<div class="modal-body">
+				<form ref='dataBaselogin' id='dataBaselogin'>
+				<div class="form-group">
+						<label for="userNameIn">Username:</label>
+						<input type="text" class="form-control" id="userNameIn" value="" placeholder="">
+				</div>
+				<div class="form-group">
+						<label for="passWordIn">Password:</label>
+						<input type="password" class="form-control" id="passWordIn" value="" placeholder="">
+				</div>
+				<div class="form-group">
+						<label for="loginDatabaseIn">DataBase:</label>
+						<input type="text" class="form-control" id="loginDatabaseIn" value="" placeholder="" maxlength:999>
+				</div>
+
+				
+					
+					<button id = "loginBtn">Login</button>
+				
+			</div>
+		
+		</div>
+	</div>
+    <h2>2750 Assignmet 3 Webpage</h2>
+    <hr>
+    <div id = statusPanel>
+        <h4>Status Panel</h4>
+        <div id="Status" style="overflow: auto; width:100%; height:100px;">
+
+            
+        </div>
+        <form ref='clearStatus'
+                id='clearStatus'>
+                <button name="clear">Clear</button>
+        </form>
+    </div>
+    <hr>
+    <div id = fileLog>
+        <h4>File Log Panel</h4>
+        <div id = "fileLogTable">
+            <table style ="width:100%" id= theFileLogTable>
+                <tr>
+                    <th>File name(click to download)</th>
+                    <th>Version</th>
+                    <th>Product ID</th>
+                    <th>Number of Events</th>
+                    <th>Number of Properties</th>
+                </tr>
+                    <tr>
+                        <td colspan = "5">No files</td>
+                    </tr>
+            </table>
+        </div>
+        
+        <form ref='uploadForm'
+                id='uploadForm'>
+                <input type = "file" name ="uploadFile" id= 'fileIn' accept=".ics">
+                <input type="submit" value ="Upload New File">
+        </form>
+    </div>
+    <datalist id="files">
+        <option value = "Test">
+    </datalist>
+
+    <hr>
+    <div id = calView>
+        <h4>Calendar View Panel</h4>
+        <p>Select the Calender you wish to view</p>
+        <form ref= 'calViewSelect' id = 'calViewSelect'>
+            <select name="viewFileSelect" id = "viewFileSelect">
+                <option value="empty">No Files</option>
+            </select>
+            <input type = "submit" value ="Show Calendar Events">
+        </form>
+        <div id = "calViewTable">
+            <table style ="width:100%" id = "calViewATable">
+                <tr>
+                    <th>Event No</th>
+                    <th>Start Date</th>
+                    <th>Start Time</th>
+                    <th>Summary</th>
+                    <th>Props</th>
+                    <th>Alarms</th>
+                    <th>Display Optional Props</th>
+                    <th>Display Alarms</th>
+                </tr>
+                <tr>
+                    <td colspan = "8">No File Selected</td>
+                </tr>
+           </table>
+        </div>
+		<div id = "phantomProps">
+		</div>
+		<div id= "phantomAlarm">
+		</div>
+		
+    </div>
+    <hr>
+    <div id = createCal>
+        <h5>Create Calendar</h5>
+        <form ref='newCalVals'
+              id='newCalVals'>
+            <div class="form-group">
+                    <label for="newFileNameIn">File Name:</label>
+                    <input type="text" class="form-control" id="newFileNameIn" value="" placeholder="cal.ics">
+            </div>
+            <div class="form-group">
+                    <label for="newVersionIn">Version Number:</label>
+                    <input type="number" class="form-control" id="newVersionIn" value="" placeholder="1">
+            </div>
+            <div class="form-group">
+                    <label for="newProdIDIn">Product ID:</label>
+                    <input type="text" class="form-control" id="newProdIDIn" value="" placeholder="product ID" maxlength:999>
+            </div>
+
+            <div class="form-group">
+                
+                <input type='submit' class="btn btn-secondary" id = "calNameBtn" value = "Create new calendar">(Will use values in the add new event to calendar section)
+            </div>
+        </form>
+    </div>
+    <hr>
+    <div id = newEvent>
+        <h5>Add New event to Calendar</h5>
+        <form ref='newEventVals' 
+              id='newEventVals'>
+			<label for="viewEventFileSelect">Calendar:</label>
+           <select name="viewEventFileSelect" id = "viewEventFileSelect">
+                <option value="empty">No Files</option>
+            </select>
+            <div class="form-group">
+                    <label for="newUIDIn">UID:</label>
+                    <input type="text" class="form-control" id="UIDIn" value="" placeholder="UID" maxlength:999>
+            </div>
+            <div class="form-group">
+                    <label for="startDateIn">Event Start Date:</label>
+                    <input list="date" class="form-control" id="startDateIn" value="" placeholder="yyyy/mm/dd"min="1900/01/01" max="2900-12-31">
+            </div>
+            <div class="form-group">
+                    <label for="startTimeIn">Event Start Time:</label>
+                    <input list="time" class="form-control" id="startTimeIn" value="" placeholder="--:--">
+                    <input type="checkbox"  id = "isUID">Is UTC
+            </div>
+			<div class="form-group">
+                    <label for="sumIn">Summary (Optional):</label>
+                    <input type="text" class="form-control" id="sumIn" value="" placeholder="summary" >
+            </div>
+            <div class="form-group">
+                
+                <input type='submit' class="btn btn-secondary" id = "calNameBtn" value = "Create new Event"> 
+            </div>
+        </form>
+
+    </div>
+    <hr>
+    <div id = createEvent>
+
+    </div>
+
+    <div id= 'sqlUI'>
+        <h5>Data Base Functions</h5>
+
+        <form ref='displayStatus'
+                id='displayStatus'>
+                <button name="displayStatus">Display Data Base Status</button>
+        </form>
+        <form ref='clearData'
+                id='clearData'>
+                <button name="clearData">Clear All Data</button>
+        </form>
+
+        <form ref='storeFiles'
+                id='storeFiles'>
+                <button name="storeFiles">Store Files</button>
+        </form>
+
+        <form ref='displayEvents'
+                id='displayEvents'>
+                <button name="displayEvents">Display Events by Start Date</button>
+        </form>
+		<form ref='displayConflicts'
+                id='displayConflicts'>
+                <button name="displayConflicts">Display Event by Conflicts</button>
+        </form>
+        <form ref= 'qEventViewSelect' id = 'qEventViewSelect'>
+            <select name="viewFileSelect" id = "viewFileSelect">
+                <option value="empty">No Files</option>
+            </select>
+            <input type = "submit" value ="Show Calendar Events From DB">
+        </form>
+		
+        <form ref= 'qOrgViewSelect' id = 'qOrgViewSelect'>
+			<div class="form-group">
+				<label for="organizerIn">Organizer:</label>
+				<input type="text" class="form-control" id="organizerIn" value="" placeholder="Organizer" maxlength:256>
+			</div>
+			<div class="form-group">
+				<input type='submit' class="btn btn-secondary" id = "orgNameBtn" value = "Show Events With This Organizer">
+			</div>
+        </form>
+		
+		<form ref= 'qLocViewSelect' id = 'qLocViewSelect'>
+            <label for="locationIn">Location:</label>
+            <input type="text" class="form-control" id="locationIn" value="" placeholder="Location" maxlength:256>
+			<input type='submit' class="btn btn-secondary" id = "locNameBtn" value = "Show Events With This Location">
+			
+        </form>
+		
+        
+        <form ref='displayAlarms'
+                id='displayAlarms'>
+                <button name="displayAlarms">Display Alarms</button>
+        </form>
+        
+        
+    </div>
+    <hr>
+    <div id = 'displayQuery'>
+
+    </div>
+    <div id = 'displayAlarmProp'>
+
+    </div>
+
+    <!-- Leave me at the bottom of body -->
+    <script src="/index.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
