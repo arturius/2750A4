@@ -747,16 +747,30 @@ char* eventToJSON(const Event* event){
     char intBuff[40];
     Property *tempProp;
     ListIterator pIt;
-    bool sumExist= false;
     if (!event){
         return"{}";
     }
+    char* sum;
+    char* org;
+    char* loc;
+    sum = malloc(sizeof(char)*2);
+    org = malloc(sizeof(char)*2);
+    loc = malloc(sizeof(char)*2);
+    strcpy(sum,"");
+    strcpy(org,"");
+    strcpy(loc,"");
 
     pIt = createIterator(event->properties);
     while ((tempProp = nextElement(&pIt))){
         if(strcmp(tempProp->propName,"SUMMARY")==0){
-            sumExist = true;
-            break;
+            sum= realloc(sum,sizeof(char)*(strlen(tempProp->propDescr)+1));
+            strcpy(sum,tempProp->propDescr);
+        }else if(strcmp(tempProp->propName,"ORGANIZER")==0){
+            org= realloc(org,sizeof(char)*(strlen(tempProp->propDescr)+1));
+            strcpy(org,tempProp->propDescr);
+        }else if(strcmp(tempProp->propName,"LOCATION")==0){
+            loc= realloc(loc,sizeof(char)*(strlen(tempProp->propDescr)+1));
+            strcpy(loc,tempProp->propDescr);
         }
     }
     tempDtJson = dtToJSON(event->startDateTime);
@@ -764,18 +778,16 @@ char* eventToJSON(const Event* event){
     plLen += getLength(event->properties);
     int alLen;
     alLen = getLength(event->alarms);
-    strLen = strlen("{\"startDT\":,\"numProps\":,\"numAlarms\":,\"summary\":\"\"}");
+    strLen = strlen("{\"startDT\":,\"numProps\":,\"numAlarms\":,\"summary\":\"\",\"org\":\"\",\"loc\":\"\"}");
     strLen += strlen(tempDtJson) + sprintf(intBuff,"%d%d",plLen,alLen);
-    if (sumExist){
-        strLen += strlen(tempProp->propDescr);
-    }
+    strLen += strlen(sum)+strlen(org)+strlen(loc)+3;
     strLen++;
     jsonFrm = malloc(strLen);
-    if (sumExist){
-        sprintf(jsonFrm,"{\"startDT\":%s,\"numProps\":%d,\"numAlarms\":%d,\"summary\":\"%s\"}",tempDtJson,plLen,alLen,tempProp->propDescr);
-    }else{
-        sprintf(jsonFrm,"{\"startDT\":%s,\"numProps\":%d,\"numAlarms\":%d,\"summary\":\"\"}",tempDtJson,plLen,alLen);
-    }
+    sprintf(jsonFrm,"{\"startDT\":%s,\"numProps\":%d,\"numAlarms\":%d,\"summary\":\"%s\",\"org\":\"%s\",\"loc\":\"%s\"}",tempDtJson,plLen,alLen,sum,org,loc);
+    
+    free(sum);
+    free(org);
+    free(loc);
     free(tempDtJson);
     return jsonFrm;
 }

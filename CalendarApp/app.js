@@ -79,7 +79,7 @@ const calLib = ffi.Library('./libcal', {
     'createCalFileFromJSON': [ 'string', ['string','string','string'] ],
     'addEventToCalFileFromJSON': [ 'string', ['string','string'] ],
 });
-
+/************************************A4 code*********************************************/
 let connection;
 
 app.get('/databaseValues', function(req , res){
@@ -90,77 +90,86 @@ app.get('/databaseValues', function(req , res){
         database : req.query.database
     });
     connection.connect(function(err) {
-        if (err){ 
-            throw err;
-        }
-        console.log("Connected!");
-    });
-    let fileTable = true;
-    let eventTable = true;
-    let alarmTable = true;
-    connection.query("show tables", function (err, rows, fields) {
         if (err){
-            console.log("Something went wrong. "+err)
-    	}else{
-		    for (let row of rows){
-                console.log(row.Tables_in_jander21+""+fileTable+""+eventTable+""+alarmTable);
-                switch(row.Tables_in_jander21){
-                    case "FILE":
-                        fileTable = false;
-                        break;
-                    case "EVENT":
-                        eventTable = false;
-                        break;
-                    case "ALARM":
-                        alarmTable = false;
-                        break;
-                }
-            }
-	    }
+            console.log(err);
+            res.send({
+               success:false,
+               "errMsg":"Could not connect to database please check your login values"
+            });
+
+        }else{
+            console.log("Connected!");
+            let fileTable = true;
+            let eventTable = true;
+            let alarmTable = true;
+            connection.query("show tables", function (err, rows, fields) {
+                if (err){
+                    res.send({
+                        success:false,
+                        "errMsg":err
+                    });
+                    console.log("Something went wrong. "+err)
+            	}else{
+      	    	    for (let row of rows){
+                        console.log(row.Tables_in_jander21+""+fileTable+""+eventTable+""+alarmTable);
+                        switch(row.Tables_in_jander21){
+                            case "FILE":
+                                fileTable = false;
+                                break;
+                            case "EVENT":
+                                eventTable = false;
+                                break;
+                            case "ALARM":
+                                alarmTable = false;
+                                break;
+                        }   
+                    }
+                    if (fileTable===true){
+                        console.log("creating file Table in database");
+                        connection.query("create table FILE ("+
+                            "cal_id INT AUTO_INCREMENT PRIMARY KEY,"+
+                            "file_Name VARCHAR(60) NOT NULL,"+    
+                            "version INT NOT NULL,"+
+                            "prod_id VARCHAR(256) NOT NULL)",
+                            function (err, rows, fields) {
+                            if (err) console.log(err);
+                        });
+                    }   
+    
+                    if (eventTable===true){
+                        console.log("creating event Table in database");
+                        connection.query("create table EVENT ("+    
+                            "event_id INT AUTO_INCREMENT PRIMARY KEY,"+
+                            "summary VARCHAR(1024),"+
+                            "start_time DATETIME NOT NULL,"+
+                            "location VARCHAR(60),"+
+                            "organizer VARCHAR(256),"+
+                            "cal_file INT NOT NULL,"+
+                            "FOREIGN KEY (cal_file) REFERENCES FILE(cal_id) ON DELETE CASCADE)",
+                            function (err, rows, fields) {
+                            if (err) console.log(+err);
+                        });
+                    }
+                    if (alarmTable=== true){
+                        console.log("creating alarm Table in database");
+                        connection.query("create table ALARM ("+
+                            "alarm_id INT AUTO_INCREMENT PRIMARY KEY,"+    
+                            "action VARCHAR(256) NOT NULL, "+
+                            "`trigger` VARCHAR(256) NOT NULL,"+
+                            "event INT NOT NULL,"+
+                            "FOREIGN KEY (event) REFERENCES EVENT(event_id) ON DELETE CASCADE )",
+                            function (err, rows, fields) {
+                            if (err) console.log(err);
+                        });
+                    }
+                    console.log("Testing");
+                    res.send({success:true});
+        	    }
+            });
+        }
+      
     });
 
-    if (fileTable===true){
-        console.log("creating file Table in database");
-        connection.query("create table FILE ("+
-            "cal_id INT AUTO_INCREMENT PRIMARY KEY,"+
-            "file_Name VARCHAR(60) NOT NULL,"+
-            "version INT NOT NULL,"+
-            "prod_id VARCHAR(256) NOT NULL)",
-            function (err, rows, fields) {
-            if (err) console.log(err);
-        });
-    }
-
-    if (eventTable===true){
-        console.log("creating event Table in database");
-        connection.query("create table EVENT ("+
-            "event_id INT AUTO_INCREMENT PRIMARY KEY,"+
-            "summary VARCHAR(1024),"+
-            "start_time DATETIME NOT NULL,"+
-            "location VARCHAR(60),"+
-            "organizer VARCHAR(256),"+
-            "cal_file INT NOT NULL,"+
-            "FOREIGN KEY (cal_file) REFERENCES FILE(cal_id) ON DELETE CASCADE)",
-            function (err, rows, fields) {
-            if (err) console.log(+err);
-        });
-    }
-    if (alarmTable=== true){
-        console.log("creating alarm Table in database");
-        connection.query("create table ALARM ("+
-            "alarm_id INT AUTO_INCREMENT PRIMARY KEY,"+
-            "action VARCHAR(256) NOT NULL, "+
-            "`trigger` VARCHAR(256) NOT NULL,"+
-            "event INT NOT NULL,"+
-            "FOREIGN KEY (event) REFERENCES EVENT(event_id) ON DELETE CASCADE )",
-            function (err, rows, fields) {
-            if (err) console.log(err);
-        });
-    }
-    res.send({
-        success:true,
-        "errMsg":"AHHHHHH"
-    });
 });
 app.get('/dataBaseStatus', function(req , res){
     let fileRows = 0;
@@ -575,6 +584,12 @@ app.get('/displayAlarmsByEvent', function(req , res){
     });
 });
 
+function convSqlDT(date,time){
+    return date.slice(0, 4) + "-" + date.slice(4,6) +"-"+date.slice(6)+
+        "T"+time.slice(0, 2) + ":" + time.slice(2,4) +":"+time.slice(4);
+}
+/************************************End of A4 code*********************************************/
+
 app.get('/getFileNamesInUpload', function(req , res){
    let files = fs.readdirSync('./uploads/');
    console.log(req.query.fileName);
@@ -792,10 +807,7 @@ function validateEventInput(input){
     }
     return "valid";
 }
-function convSqlDT(date,time){
-    return date.slice(0, 4) + "-" + date.slice(4,6) +"-"+date.slice(6)+
-        "T"+time.slice(0, 2) + ":" + time.slice(2,4) +":"+time.slice(4);
-}
+
 
 app.listen(portNum);
 console.log('Running app at localhost: ' + portNum);

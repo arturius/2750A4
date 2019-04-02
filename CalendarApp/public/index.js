@@ -195,7 +195,7 @@ $(document).ready(function() {
         $.ajax({});
 
     });
-
+/*****************************A4 page querys****************************************/
     $('#displayStatus').submit(function(e){
         getDBStatus();
 
@@ -442,9 +442,6 @@ $(document).ready(function() {
                         if(item.trigger == ""){
                             item.trigger = "N/A";
                         }
-
-                        
-
                         let markup = "<tr><td>"+item.action+"</td><td>"
                             +item.trigger+"</td></tr>"
                         $("#qAlarmViewTable tbody").append(markup);
@@ -583,10 +580,12 @@ $(document).ready(function() {
         //Pass data to the Ajax call, so it gets passed to the 
         $.ajax({});
     });
-
+/***************************** End of A4 page querys********************************/
+ 
 
 });
-
+/*****************************A4 functions****************************************/
+ 
 function qAlarms(eventId){
     $('#displayAlarmProp').html("<h4>Alarms for selected Event</h4>"
         +"<table style =\"width:100%\" id = \"qAlarmViewTable\">" 
@@ -609,6 +608,7 @@ function qAlarms(eventId){
                         + item.trigger+"</td><tr>";
                     $("#qAlarmViewTable tbody").append(markup);
                 });
+                getDBStatus();
             }else{
                 updateStatus(data.errMsg);
             }
@@ -619,8 +619,67 @@ function qAlarms(eventId){
         }
     });
 }
+function getDataBaseLogin(){
+    let dataBaseConnected = false;
+    let modal = document.getElementById('loginModal');
+    modal.style.display = "block";      
+    let login = document.getElementById("loginBtn");
+    console.log("AHHH"+login);
+    login.onclick =function(e){ 
+        e.preventDefault();
+        console.log("Trying to connect to Database");
+        $.ajax({
+            type: 'get',            //Request type
+            dataType: 'json',       //Data type - we will use JSON for almost everything 
+            url: '/databaseValues', 
+            data:{
+                host     : 'dursley.socs.uoguelph.ca',
+                user     : document.getElementById('userNameIn').value,
+                password : document.getElementById('passWordIn').value,
+                database : document.getElementById('loginDatabaseIn').value
+            },
+            success: function (state) {
+                console.log(state);
+                if (state.success){
+                    dataBaseConnected = true;
+                    modal.style.display = "none";
+                    console.log("Conected");
+               //We write the object to the console to show that the request was successful
+                }else{
+                   alert(state.errMsg);
+                }
+            },
+            fail: function(error) {
+                // Non-200 return, do something with error
+                console.log(error); 
+            }
+        });
+    }
+    console.log(dataBaseConnected);
+    if (dataBaseConnected == true){
+        console.log("Close");
+    }
+    getDBStatus();
+}
 
+function getDBStatus(){
+    $.ajax({
+        type: 'get',            //Request type
+        dataType: 'json',       //Data type - we will use JSON for almost everything 
+        url: '/dataBaseStatus', 
+       
+        success: function (state) {
+            updateStatus("Database has "+state.fRows+" files, "+state.eRows+" events, and "+state.aRows+" alarms");
+        },
+        fail: function(error) {
+            // Non-200 return, do something with error
+            console.log(error); 
+        }
+    });
+}
 
+/*****************************End of A4 Functions****************************************/
+ 
 function clearProps(){
     $('#phantomProps').html("");
 }
@@ -813,62 +872,4 @@ function updateStatus(statusMessage){
     element.scrollTop = element.scrollHeight;
 }
 
-function getDataBaseLogin(){
-    let dataBaseConnected = false;
-    let modal = document.getElementById('loginModal');
-    modal.style.display = "block";      
-    let login = document.getElementById("loginBtn");
-    console.log("AHHH"+login);
-    login.onclick =function(e){
-        e.preventDefault();
-        console.log(document.getElementById('passWordIn').value);
-        $.ajax({
-            type: 'get',            //Request type
-            dataType: 'json',       //Data type - we will use JSON for almost everything 
-            url: '/databaseValues', 
-            data:{
-                host     : 'dursley.socs.uoguelph.ca',
-                user     : document.getElementById('userNameIn').value,
-                password : document.getElementById('passWordIn').value,
-                database : document.getElementById('loginDatabaseIn').value
-            },
-            success: function (state) {
-                console.log(state);
-                if (state.success){
-                    dataBaseConnected = true;
-                    modal.style.display = "none";
-
-               //We write the object to the console to show that the request was successful
-                }else{
-                   updateStatus(state.errMsg);
-                }
-            },
-            fail: function(error) {
-                // Non-200 return, do something with error
-                console.log(error); 
-            }
-        });
-    }
-    console.log(dataBaseConnected);
-    if (dataBaseConnected == true){
-        console.log("Close");
-    }
-    getDBStatus();
-}
-
-function getDBStatus(){
-    $.ajax({
-        type: 'get',            //Request type
-        dataType: 'json',       //Data type - we will use JSON for almost everything 
-        url: '/dataBaseStatus', 
-       
-        success: function (state) {
-            updateStatus("Database has "+state.fRows+" files, "+state.eRows+" events, and "+state.aRows+" alarms");
-        },
-        fail: function(error) {
-            // Non-200 return, do something with error
-            console.log(error); 
-        }
-    });
-}
 
